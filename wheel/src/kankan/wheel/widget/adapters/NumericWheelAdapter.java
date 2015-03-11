@@ -29,9 +29,16 @@ public class NumericWheelAdapter extends AbstractWheelTextAdapter {
     /** The default max value */
     private static final int DEFAULT_MIN_VALUE = 0;
     
+    /** Sort order */
+    public enum SortOrder {
+    	SMALLEST_AT_BOTTOM,
+    	SMALLEST_AT_TOP
+    }
+    
     // Values
     private int minValue;
     private int maxValue;
+    private SortOrder sortOrder = SortOrder.SMALLEST_AT_TOP;
     
     // format
     private String format;
@@ -51,7 +58,18 @@ public class NumericWheelAdapter extends AbstractWheelTextAdapter {
      * @param maxValue the wheel max value
      */
     public NumericWheelAdapter(Context context, int minValue, int maxValue) {
-        this(context, minValue, maxValue, null);
+        this(context, minValue, maxValue, null, SortOrder.SMALLEST_AT_TOP);
+    }
+
+    /**
+     * Constructor
+     * @param context the current context
+     * @param minValue the wheel min value
+     * @param maxValue the wheel max value
+     * @param sortOrder the sort order
+     */
+    public NumericWheelAdapter(Context context, int minValue, int maxValue, SortOrder sortOrder) {
+        this(context, minValue, maxValue, null, sortOrder);
     }
 
     /**
@@ -62,17 +80,35 @@ public class NumericWheelAdapter extends AbstractWheelTextAdapter {
      * @param format the format string
      */
     public NumericWheelAdapter(Context context, int minValue, int maxValue, String format) {
+    	this(context, minValue, maxValue, format, SortOrder.SMALLEST_AT_TOP);
+    }
+
+    /**
+     * Constructor
+     * @param context the current context
+     * @param minValue the wheel min value
+     * @param maxValue the wheel max value
+     * @param format the format string
+     * @param sortOrder the sort order
+     */
+    public NumericWheelAdapter(Context context, int minValue, int maxValue, String format, SortOrder sortOrder) {
         super(context);
         
         this.minValue = minValue;
         this.maxValue = maxValue;
         this.format = format;
+        this.sortOrder = sortOrder;
     }
 
     @Override
     public CharSequence getItemText(int index) {
         if (index >= 0 && index < getItemsCount()) {
-            int value = minValue + index;
+        	int value;
+        	if (sortOrder == SortOrder.SMALLEST_AT_TOP){
+        		value = minValue + index;
+        	} else {
+        		value = maxValue - index;
+        	}
             return format != null ? String.format(format, value) : Integer.toString(value);
         }
         return null;
